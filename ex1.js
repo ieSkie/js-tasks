@@ -1,27 +1,46 @@
-// Implement the function unique_in_order which takes as argument a sequence and
-// returns a list of items without any elements with the same value next to each
-// other and preserving the original order of elements.
-var uniqueInOrder=function(iterable){
-  if (typeof iterable === "string") {
-    iterable = [...iterable];
-  } 
-  for (let i = 0; i < iterable.length; i++) {
-    if (iterable[i] === iterable[i+1]) {
-      delete iterable[i];
-      i--;
+// Write a function that takes an array of numbers (integers for the tests) and a target number. 
+// It should find two different items in the array that, when added together, give the target value. 
+// The indexes of these items should then be returned in a tuple / list (depending on your language) like so: (index1, index2).
+// For the purposes of this kata, some tests may have multiple answers; any valid solutions will be accepted.
+// The input will always be valid (numbers will be an array of length 2 or greater, 
+// and all of the items will be numbers; target will always be the sum of two different items from that array).
+
+function twoSum(numbers, target) {
+  for (let i = 0; i < numbers.length; i++) {
+    for (let j = i + 1; j < numbers.length; j++) {
+      if (numbers[i] + numbers[j] === target) {return [i, j]}
     }
   }
-  return iterable.filter(x => x !== undefined);
+}
+console.log(twoSum([1,2,3], 4));
+
+
+// The goal of this exercise is to convert a string to a new string where each character in the new string is "(" if that character appears only once in the original string,
+// or ")" if that character appears more than once in the original string. Ignore capitalization when determining if a character is a duplicate.
+
+// Examples
+// "din"      =>  "((("
+// "recede"   =>  "()()()"
+// "Success"  =>  ")())())"
+// "(( @"     =>  "))(("
+
+function duplicateEncode(word){
+    const lowerWord = word.toLowerCase();
+    const arr = lowerWord.split('');
+    const result = [];
+    
+    for (let i = 0; i < arr.length; i++) { 
+        let isDupicate = false;
+      
+        for (let j = 0; j < arr.length; j++) {
+          
+            if (i !== j &&  arr[i] === arr[j]) {
+                isDupicate = true;
+                break;
+            }
+        }
+        result.push(isDupicate ? ")" : "(");
+    }
+    return result.join('');
 }
 
-// Implement a function that computes the difference between two lists. The function should remove all occurrences of elements from the first
-// list (a) that are present in the second list (b). The order of elements in the first list should be preserved in the result.
-function arrayDiff(a, b) {
-  const result = [];
-  for (let i = 0; i < a.length; i++) {
-    if (!b.includes(a[i])) {
-      result.push(a[i]);
-    }
-  }
-  return result;
-}
