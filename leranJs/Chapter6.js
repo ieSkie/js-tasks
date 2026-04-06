@@ -29,3 +29,31 @@ const newUser = {
     city: "Санкт-Петербург",
   },
 };
+// замыкания
+function createCounter(initialValue) {
+  let counter = initialValue;
+
+  return {
+    increment: function () {
+      return ++counter;
+    },
+    decrement: function () {
+      return --counter;
+    },
+    getValue: function () {
+      return counter;
+    },
+    reset: function () {
+      counter = initialValue;
+      return counter;
+    },
+  };
+}
+
+const counter = createCounter(5);
+console.log(counter.getValue());
+console.log(counter.increment());
+console.log(counter.increment());
+console.log(counter.decrement());
+counter.reset();
+console.log(counter.getValue());
