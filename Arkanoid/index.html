@@ -1,0 +1,25 @@
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Арканоид</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="wrapper">
+      <canvas id="game" width="480" height="600"></canvas>
+      <div id="overlay" class="overlay">
+        <div id="overlayText" class="overlay-text">GAME OVER</div>
+        <button id="restartBtn">Заново</button>
+      </div>
+      <div class="sidebar">
+        <div class="score-label">HIGH SCORE</div>
+        <div class="score-value" id="highScore">0</div>
+        <div class="score-label">1UP</div>
+        <div class="score-value" id="score">0</div>
+        <div class="score-label">ROUND</div>
+        <div class="score-value" id="round">1</div>
+      </div>
+    </div>
+    <script src="game.js"></script>
+  </body>
+</html>
