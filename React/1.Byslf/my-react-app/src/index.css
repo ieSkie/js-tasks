@@ -1,0 +1,45 @@
+/* App.css или index.css */
+.btn {
+  background-color: aquamarine;
+  height: 30px;
+  width: 75px;
+  margin: 5px;
+  border: none;
+  cursor: pointer;
+}
+
+.h1_green {
+  color: green;
+}
+
+.h1_red {
+  color: red;
+}
+
+.for_list {
+  padding: 20px;
+  width: 300px;
+  border: 2px solid black;
+  margin-top: 20px;
+}
+
+.for_list input {
+  margin-right: 10px;
+  padding: 5px;
+}
+
+.for_list ul {
+  padding-left: 20px;
+}
+
+.for_list li {
+  margin: 10px 0;
+}
+
+.for_list li button {
+  margin-left: 10px;
+  background-color: #ff6b6b;
+  border: none;
+  cursor: pointer;
+  padding: 2px 8px;
+}

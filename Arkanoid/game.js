@@ -5,7 +5,7 @@ const W = canvas.width;
 const H = canvas.height;
 
 const paddle = {
-  width: 400,
+  width: 480,
   height: 12,
   x: W / 2 - 40,
   y: H - 30,
@@ -62,12 +62,13 @@ for (let row = 0; row < ROWS; row++) {
 
 const overlay = document.getElementById("overlay");
 const counter = document.getElementById("score");
+const saved = sessionStorage.getItem("highScore");
 
 let isGameOver = false;
 let score = 0;
+let highScore = 0;
 
 function draw() {
-  if (isGameOver) return;
   // Игровое поле
   ctx.fillStyle = "#00008b";
   ctx.fillRect(0, 0, W, H);
@@ -84,19 +85,41 @@ function draw() {
 
   // Кирпичики
   bricks.forEach((brick) => brick.draw());
+  if (isGameOver) return;
 }
 
 function update() {
   if (isGameOver) return;
+
+  updatePaddle();
+  updateBall();
+  checkBallCollisions();
+  checkGameOver();
+  checkBrickCollisions();
+}
+
+function updateHighScore() {
+  if (score > highScore) {
+    highScore = score;
+    sessionStorage.setItem("highScore", highScore);
+    document.getElementById("highScore").textContent = highScore;
+  }
+}
+function updatePaddle() {
   if (paddle.movingLeft) paddle.x -= paddle.speed;
   if (paddle.movingRight) paddle.x += paddle.speed;
 
+  // Границы платформы
   if (paddle.x < 0) paddle.x = 0;
   if (paddle.x + paddle.width > W) paddle.x = W - paddle.width;
+}
 
+function updateBall() {
   ball.x += ball.speedX;
   ball.y += ball.speedY;
-
+}
+function checkBallCollisions() {
+  // Стены (левая, правая, верхняя)
   if (ball.x - ball.radius < 0 || ball.x + ball.radius > W) {
     ball.speedX = -ball.speedX;
   }
@@ -105,48 +128,70 @@ function update() {
     ball.speedY = -ball.speedY;
   }
 
-  if (
+  // Платформа
+  if (ballCollidesWithPaddle()) {
+    ball.speedY = -Math.abs(ball.speedY);
+    ball.y = paddle.y - ball.radius;
+  }
+}
+
+function ballCollidesWithPaddle() {
+  return (
     ball.y + ball.radius >= paddle.y &&
     ball.y + ball.radius <= paddle.y + paddle.height &&
     ball.x + ball.radius >= paddle.x &&
     ball.x - ball.radius <= paddle.x + paddle.width
-  ) {
-    ball.speedY = -Math.abs(ball.speedY);
-    ball.y = paddle.y - ball.radius;
-  }
-
+  );
+}
+function checkGameOver() {
   if (ball.y > H) {
     isGameOver = true;
+    updateHighScore();
     overlay.style.display = "flex";
   }
-
-  bricks.forEach((brick) => {
-    if (!brick.alive) return;
-
-    if (
-      ball.x + ball.radius >= brick.x &&
-      ball.x - ball.radius <= brick.x + BRICK_W &&
-      ball.y + ball.radius >= brick.y &&
-      ball.y - ball.radius <= brick.y + BRICK_H
-    ) {
-      brick.alive = false;
-      score++;
-      counter.textContent = score;
-      if (checkWin()) {
-        document.getElementById("overlayText").textContent = "YOU WIN";
-        const btn = document.getElementById("restartBtn");
-        btn.textContent = "Next level";
-        btn.onclick = () =>
-          (window.location.href =
-            "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&t=43s");
-        overlay.style.display = "flex";
-        isGameOver = true;
-      }
-      ball.speedY = -ball.speedY;
-    }
-  });
 }
 
+function checkBrickCollisions() {
+  for (let brick of bricks) {
+    if (!brick.alive) continue;
+
+    if (ballCollidesWithBrick(brick)) {
+      destroyBrick(brick);
+      ball.speedY = -ball.speedY;
+      break;
+    }
+  }
+}
+
+function ballCollidesWithBrick(brick) {
+  return (
+    ball.x + ball.radius >= brick.x &&
+    ball.x - ball.radius <= brick.x + BRICK_W &&
+    ball.y + ball.radius >= brick.y &&
+    ball.y - ball.radius <= brick.y + BRICK_H
+  );
+}
+
+function destroyBrick(brick) {
+  brick.alive = false;
+  score++;
+  counter.textContent = score;
+
+  if (checkWin()) {
+    winGame();
+  }
+}
+
+function winGame() {
+  document.getElementById("overlayText").textContent = "YOU WIN";
+  const btn = document.getElementById("restartBtn");
+  btn.textContent = "Next level";
+  btn.onclick = () => {
+    window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=43s";
+  };
+  overlay.style.display = "flex";
+  isGameOver = true;
+}
 function resetGame() {
   ball.x = W / 2;
   ball.y = H - 50;
@@ -156,9 +201,6 @@ function resetGame() {
   bricks.forEach((brick) => (brick.alive = true));
   score = 0;
   counter.textContent = score;
-  const btn = document.getElementById("restartBtn");
-  btn.textContent = "Заново";
-  btn.onclick = null;
   isGameOver = false;
   overlay.style.display = "none";
 }
@@ -175,12 +217,12 @@ function checkWin() {
 
 document.addEventListener("keydown", (e) => {
   if (e.key === "ArrowLeft" || e.key === "a") paddle.movingLeft = true;
-  if (e.key === "ArrowRight" || e.key == "d") paddle.movingRight = true;
+  if (e.key === "ArrowRight" || e.key === "d") paddle.movingRight = true;
 });
 
 document.addEventListener("keyup", (e) => {
   if (e.key === "ArrowLeft" || e.key === "a") paddle.movingLeft = false;
-  if (e.key === "ArrowRight" || e.key == "d") paddle.movingRight = false;
+  if (e.key === "ArrowRight" || e.key === "d") paddle.movingRight = false;
 });
 document.getElementById("restartBtn").addEventListener("click", resetGame);
 
