@@ -5,7 +5,7 @@ const W = canvas.width;
 const H = canvas.height;
 
 const paddle = {
-  width: 480,
+  width: 80,
   height: 12,
   x: W / 2 - 40,
   y: H - 30,
@@ -20,6 +20,15 @@ const ball = {
   y: H - 40,
   speedX: 3,
   speedY: -3,
+};
+
+const paddleBooster = {
+  width: 30,
+  height: 10,
+  x: -100,
+  y: -100,
+  speed: 2,
+  isActive: false,
 };
 
 const ROWS = 6;
@@ -62,30 +71,37 @@ for (let row = 0; row < ROWS; row++) {
 
 const overlay = document.getElementById("overlay");
 const counter = document.getElementById("score");
-const saved = sessionStorage.getItem("highScore");
 
 let isGameOver = false;
 let score = 0;
-let highScore = 0;
+let highScore = sessionStorage.getItem("highScore") || 0;
+let boosterTimer = null;
+
+document.getElementById("highScore").textContent = highScore;
 
 function draw() {
-  // Игровое поле
   ctx.fillStyle = "#00008b";
   ctx.fillRect(0, 0, W, H);
 
-  // Платформа
   ctx.fillStyle = "#e74c3c";
   ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
 
-  // Мяч
   ctx.beginPath();
   ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
   ctx.fillStyle = "white";
   ctx.fill();
 
-  // Кирпичики
   bricks.forEach((brick) => brick.draw());
-  if (isGameOver) return;
+
+  if (paddleBooster.isActive) {
+    ctx.fillStyle = "orange";
+    ctx.fillRect(
+      paddleBooster.x,
+      paddleBooster.y,
+      paddleBooster.width,
+      paddleBooster.height,
+    );
+  }
 }
 
 function update() {
@@ -94,22 +110,15 @@ function update() {
   updatePaddle();
   updateBall();
   checkBallCollisions();
+  checkBoosterCollision();
   checkGameOver();
   checkBrickCollisions();
 }
 
-function updateHighScore() {
-  if (score > highScore) {
-    highScore = score;
-    sessionStorage.setItem("highScore", highScore);
-    document.getElementById("highScore").textContent = highScore;
-  }
-}
 function updatePaddle() {
   if (paddle.movingLeft) paddle.x -= paddle.speed;
   if (paddle.movingRight) paddle.x += paddle.speed;
 
-  // Границы платформы
   if (paddle.x < 0) paddle.x = 0;
   if (paddle.x + paddle.width > W) paddle.x = W - paddle.width;
 }
@@ -118,8 +127,8 @@ function updateBall() {
   ball.x += ball.speedX;
   ball.y += ball.speedY;
 }
+
 function checkBallCollisions() {
-  // Стены (левая, правая, верхняя)
   if (ball.x - ball.radius < 0 || ball.x + ball.radius > W) {
     ball.speedX = -ball.speedX;
   }
@@ -128,10 +137,22 @@ function checkBallCollisions() {
     ball.speedY = -ball.speedY;
   }
 
-  // Платформа
   if (ballCollidesWithPaddle()) {
     ball.speedY = -Math.abs(ball.speedY);
     ball.y = paddle.y - ball.radius;
+
+    const hitPos =
+      (ball.x - (paddle.x + paddle.width / 2)) / (paddle.width / 2);
+
+    const direction = hitPos > 0 ? 1 : -1;
+    ball.speedX = direction * Math.abs(ball.speedX);
+
+    if (Math.abs(hitPos) < 0.1) {
+      ball.speedX = (Math.random() > 0.5 ? 1 : -1) * Math.abs(ball.speedX);
+    }
+    if (Math.abs(ball.speedX) < 1) {
+      ball.speedX = ball.speedX >= 0 ? 1 : -1;
+    }
   }
 }
 
@@ -143,6 +164,30 @@ function ballCollidesWithPaddle() {
     ball.x - ball.radius <= paddle.x + paddle.width
   );
 }
+
+function checkBoosterCollision() {
+  if (!paddleBooster.isActive) return;
+
+  paddleBooster.y += paddleBooster.speed;
+
+  if (
+    paddleBooster.y + paddleBooster.height >= paddle.y &&
+    paddleBooster.x + paddleBooster.width >= paddle.x &&
+    paddleBooster.x <= paddle.x + paddle.width
+  ) {
+    paddle.width += 30;
+    paddleBooster.isActive = false;
+    clearTimeout(boosterTimer);
+    boosterTimer = setTimeout(() => {
+      paddle.width -= 30;
+    }, 5000);
+  }
+
+  if (paddleBooster.y > H) {
+    paddleBooster.isActive = false;
+  }
+}
+
 function checkGameOver() {
   if (ball.y > H) {
     isGameOver = true;
@@ -174,7 +219,10 @@ function ballCollidesWithBrick(brick) {
 
 function destroyBrick(brick) {
   brick.alive = false;
-  score++;
+  if (Math.random() < 0.03) {
+    paddleExpansion(brick);
+  }
+  ++score;
   counter.textContent = score;
 
   if (checkWin()) {
@@ -182,37 +230,58 @@ function destroyBrick(brick) {
   }
 }
 
+function paddleExpansion(brick) {
+  paddleBooster.x = brick.x;
+  paddleBooster.y = brick.y;
+  paddleBooster.isActive = true;
+}
+
+function updateHighScore() {
+  if (score > highScore) {
+    highScore = score;
+    sessionStorage.setItem("highScore", highScore);
+    document.getElementById("highScore").textContent = highScore;
+  }
+}
+
+function checkWin() {
+  return bricks.every((brick) => !brick.alive);
+}
+
 function winGame() {
+  updateHighScore();
   document.getElementById("overlayText").textContent = "YOU WIN";
   const btn = document.getElementById("restartBtn");
   btn.textContent = "Next level";
-  btn.onclick = () => {
-    window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=43s";
-  };
+  btn.onclick = () => resetGame();
   overlay.style.display = "flex";
   isGameOver = true;
 }
+
 function resetGame() {
   ball.x = W / 2;
   ball.y = H - 50;
   ball.speedX = 3;
   ball.speedY = -3;
   paddle.x = W / 2 - 40;
+  paddle.width = 80;
+  paddleBooster.isActive = false;
   bricks.forEach((brick) => (brick.alive = true));
   score = 0;
   counter.textContent = score;
   isGameOver = false;
   overlay.style.display = "none";
+  const btn = document.getElementById("restartBtn");
+  btn.textContent = "Заново";
+  document.getElementById("overlayText").textContent = "GAME OVER";
+  btn.onclick = null;
+  clearTimeout(boosterTimer);
 }
 
 function gameLoop() {
   update();
   draw();
   requestAnimationFrame(gameLoop);
-}
-
-function checkWin() {
-  return bricks.every((brick) => !brick.alive);
 }
 
 document.addEventListener("keydown", (e) => {
@@ -224,6 +293,7 @@ document.addEventListener("keyup", (e) => {
   if (e.key === "ArrowLeft" || e.key === "a") paddle.movingLeft = false;
   if (e.key === "ArrowRight" || e.key === "d") paddle.movingRight = false;
 });
+
 document.getElementById("restartBtn").addEventListener("click", resetGame);
 
 requestAnimationFrame(gameLoop);
