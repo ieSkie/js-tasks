@@ -31,6 +31,20 @@ const paddleBooster = {
   isActive: false,
 };
 
+const shootBooster = {
+  width: 30,
+  height: 10,
+  x: -100,
+  y: -100,
+  speed: 2,
+  isActive: false,
+};
+
+let bullets = [];
+let canShoot = false;
+let shootTimer = null;
+let shootInterval = null;
+
 const ROWS = 6;
 const COLS = 10;
 const BRICK_W = 46;
@@ -102,6 +116,19 @@ function draw() {
       paddleBooster.height,
     );
   }
+  if (shootBooster.isActive) {
+    ctx.fillStyle = "red";
+    ctx.fillRect(
+      shootBooster.x,
+      shootBooster.y,
+      shootBooster.width,
+      shootBooster.height,
+    );
+  }
+  bullets.forEach((b) => {
+    ctx.fillStyle = "yellow";
+    ctx.fillRect(b.x - 2, b.y, 4, 8);
+  });
 }
 
 function update() {
@@ -110,7 +137,9 @@ function update() {
   updatePaddle();
   updateBall();
   checkBallCollisions();
-  checkBoosterCollision();
+  checkPaddleBoosterCollision();
+  checkShootBoosterCollision();
+  updateBullets();
   checkGameOver();
   checkBrickCollisions();
 }
@@ -128,6 +157,26 @@ function updateBall() {
   ball.y += ball.speedY;
 }
 
+function updateBullets() {
+  bullets = bullets.filter((b) => b.isActive);
+  bullets.forEach((b) => {
+    b.y -= 5;
+    if (b.y < 0) b.isActive = false;
+    for (let brick of bricks) {
+      if (!brick.alive) continue;
+      if (
+        b.x >= brick.x &&
+        b.x <= brick.x + BRICK_W &&
+        b.y >= brick.y &&
+        b.y <= brick.y + BRICK_H
+      ) {
+        destroyBrick(brick);
+        b.isActive = false;
+        break;
+      }
+    }
+  });
+}
 function checkBallCollisions() {
   if (ball.x - ball.radius < 0 || ball.x + ball.radius > W) {
     ball.speedX = -ball.speedX;
@@ -165,7 +214,7 @@ function ballCollidesWithPaddle() {
   );
 }
 
-function checkBoosterCollision() {
+function checkPaddleBoosterCollision() {
   if (!paddleBooster.isActive) return;
 
   paddleBooster.y += paddleBooster.speed;
@@ -185,6 +234,37 @@ function checkBoosterCollision() {
 
   if (paddleBooster.y > H) {
     paddleBooster.isActive = false;
+  }
+}
+
+function checkShootBoosterCollision() {
+  if (!shootBooster.isActive) return;
+
+  shootBooster.y += shootBooster.speed;
+
+  if (
+    shootBooster.y + shootBooster.height >= paddle.y &&
+    shootBooster.x + shootBooster.width >= paddle.x &&
+    shootBooster.x <= paddle.x + paddle.width
+  ) {
+    canShoot = true;
+    shootBooster.isActive = false;
+    shootInterval = setInterval(() => {
+      bullets.push({
+        x: paddle.x + paddle.width / 2,
+        y: paddle.y,
+        isActive: true,
+      });
+    }, 1000);
+    clearTimeout(shootTimer);
+    shootTimer = setTimeout(() => {
+      canShoot = false;
+      clearInterval(shootInterval);
+    }, 5000);
+  }
+
+  if (shootBooster.y > H) {
+    shootBooster.isActive = false;
   }
 }
 
@@ -219,8 +299,11 @@ function ballCollidesWithBrick(brick) {
 
 function destroyBrick(brick) {
   brick.alive = false;
-  if (Math.random() < 0.03) {
-    paddleExpansion(brick);
+  const roll = Math.random();
+  if (roll > 0.98) {
+    paddleBoosterFalling(brick);
+  } else if (roll < 0.03) {
+    shootBoosterFalling(brick);
   }
   ++score;
   counter.textContent = score;
@@ -230,10 +313,17 @@ function destroyBrick(brick) {
   }
 }
 
-function paddleExpansion(brick) {
+function paddleBoosterFalling(brick) {
+  if (paddleBooster.isActive) return;
   paddleBooster.x = brick.x;
   paddleBooster.y = brick.y;
   paddleBooster.isActive = true;
+}
+function shootBoosterFalling(brick) {
+  if (shootBooster.isActive) return;
+  shootBooster.x = brick.x;
+  shootBooster.y = brick.y;
+  shootBooster.isActive = true;
 }
 
 function updateHighScore() {
@@ -259,23 +349,42 @@ function winGame() {
 }
 
 function resetGame() {
+  // Мяч
   ball.x = W / 2;
   ball.y = H - 50;
   ball.speedX = 3;
   ball.speedY = -3;
+
+  // Платформа
   paddle.x = W / 2 - 40;
   paddle.width = 80;
-  paddleBooster.isActive = false;
+
+  // Блоки
   bricks.forEach((brick) => (brick.alive = true));
+
+  // Бустеры и пули
+  paddleBooster.isActive = false;
+  shootBooster.isActive = false;
+  bullets = [];
+  canShoot = false;
+  clearTimeout(boosterTimer);
+  clearTimeout(shootTimer);
+  clearInterval(shootInterval);
+  boosterTimer = null;
+  shootTimer = null;
+  shootInterval = null;
+
+  // Счёт
   score = 0;
-  counter.textContent = score;
+  counter.textContent = 0;
+
+  // UI
   isGameOver = false;
   overlay.style.display = "none";
   const btn = document.getElementById("restartBtn");
   btn.textContent = "Заново";
-  document.getElementById("overlayText").textContent = "GAME OVER";
   btn.onclick = null;
-  clearTimeout(boosterTimer);
+  document.getElementById("overlayText").textContent = "GAME OVER";
 }
 
 function gameLoop() {
