@@ -1,0 +1,139 @@
+* {
+  box-sizing: border-box;
+}
+:root {
+  --paper: #f1ede2;
+  --ink: #211b18;
+  --muted: #655b54;
+  --line: #c7beb2;
+  --accent: #302038;
+  --white: #ffffff;
+  --hover: #e9e3d6;
+  --shell: 120px; /* от краев */
+  --gutter: 24px; /* межколонник сетки */
+  --col: 384px; /* ширина колонки и карточки */
+}
+body {
+  margin: 0;
+  background-color: var(--paper);
+  color: #211b18;
+  font-family: "Manrope", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 26px;
+}
+.logo {
+  font-family: Georgia, serif; /* временно вместо Oranienbaum */
+  font-size: 24px;
+  color: #211b18;
+  text-decoration: none;
+}
+.nav {
+  display: flex;
+  gap: 36px;
+}
+.nav a {
+  font-size: 14px;
+  color: #211b18;
+  text-decoration: none;
+}
+.site-header {
+  border-bottom: 1px solid var(--line);
+  padding-inline: var(--shell);
+}
+
+.header__row {
+  max-width: 1200px;
+  margin-inline: auto;
+  height: 96px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 32px;
+}
+
+.btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  height: 48px;
+  padding-inline: 22px;
+  background-color: var(--accent);
+  color: var(--paper);
+  font-size: 14px;
+}
+
+.layout {
+  max-width: 1440px;
+  margin-inline: auto;
+  padding-inline: var(--shell);
+  padding-top: 56px;
+  padding-bottom: 64px;
+}
+
+.layout__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--col);
+  gap: var(--gutter);
+  align-items: end;
+}
+
+.label {
+  margin: 0;
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.layout__title {
+  margin: 0;
+  margin-top: 22px;
+  font-family: "Oranienbaum", Georgia, serif;
+  font-weight: 400;
+  font-size: 72px;
+  line-height: 76px;
+}
+
+.layout__right {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.layout__text {
+  margin: 0;
+  font-size: 16px;
+  line-height: 26px;
+}
+
+.layout__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 40px;
+  border: 1px solid var(--line);
+}
+.main__flex {
+  padding-top: 40px;
+  height: auto;
+  margin-inline: auto;
+  display: flex;
+  max-width: 1200px;
+  justify-content: space-between;
+  align-items: baseline;
+  border-top: 1px solid var(--line);
+}
+.main__title {
+  margin: 0;
+  font-family: "Oranienbaum", Georgia, serif;
+  font-weight: 400;
+  font-size: 48px;
+  line-height: 52px;
+}
+.main__text {
+  margin: 0;
+  font-size: 12px;
+  line-height: 18px;
+}
