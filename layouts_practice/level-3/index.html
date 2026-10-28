@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>devnotes — блог о вёрстке</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="container header__inner">
+        <a class="header__logo" href="#"
+          >dev<span style="color: #2f5bd3">notes</span></a
+        >
+        <nav class="header__nav">
+          <a>Статьи</a>
+          <a>Гайды</a>
+          <a>Подкасты</a>
+          <a>Об авторе</a>
+        </nav>
+        <input placeholder="Поиск по статьям" class="header__input" />
+      </div>
+    </header>
+
+    <main class="main container">
+      <div class="featured">
+        <img class="featured__img" src="img/grid.img" />
+        <div class="featured__body">
+          <span class="tag">Главная</span>
+          <h1 class="featured__h1">
+            Почему CSS Grid изменил то, как мы верстаем
+          </h1>
+          <p class="featured__description">
+            Разбираем на примерах, когда брать grid, а когда хватит flexbox, и
+            как их совмещать
+          </p>
+          <div class="featured__meta">
+            <img class="featured__avatar" src="img/геральт.jpeg" />
+            <span>Иван Петров · 12 окт · 8 мин</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="layout">
+        <section class="posts">
+          <div class="posts__head">
+            <h2 class="posts__title">Свежие статьи</h2>
+            <div class="filters">
+              <button class="filters__btn filters__btn--active">Все</button>
+              <button class="filters__btn">CSS</button>
+              <button class="filters__btn">HTML</button>
+              <button class="filters__btn">Дизайн</button>
+            </div>
+          </div>
+
+          <div class="posts__list">
+            <article class="post">
+              <a class="post__link" href="#">
+                <img class="post__img" src="img/stas.jpg" alt="" />
+                <p class="post__category">CSS</p>
+                <h3 class="post__title">Переменные в CSS на практике</h3>
+                <p class="post__text">
+                  Как завести дизайн-токены и не утонуть в цветах.
+                </p>
+                <time class="post__date" datetime="2026-10-10"
+                  >10 окт · 5 мин</time
+                >
+              </a>
+            </article>
+            <article class="post">
+              <a class="post__link" href="#">
+                <img class="post__img" src="img/котик.jpg" alt="" />
+                <p class="post__category">Дизайн</p>
+                <h3 class="post__title">Типографика для разработчиков</h3>
+                <p class="post__text">
+                  Размеры, интерлиньях и ритм без дизайнера.
+                </p>
+                <time class="post__date" datetime="2026-10-10"
+                  >8 окт · 7 мин</time
+                >
+              </a>
+            </article>
+            <article class="post">
+              <a class="post__link" href="#">
+                <img class="post__img" src="img/tema.jpg" alt="" />
+                <p class="post__category">HTML</p>
+                <h3 class="post__title">Доступные формы без боли</h3>
+                <p class="post__text">
+                  Label, ошибки и фокус - что важно на самом деле.
+                </p>
+                <time class="post__date" datetime="2026-10-10"
+                  >5 окт · 6 мин</time
+                >
+              </a>
+            </article>
+            <article class="post">
+              <a class="post__link" href="#">
+                <img class="post__img" src="img/tai.jpg" alt="" />
+                <p class="post__category">Адаптив</p>
+                <h3 class="post__title">Mobile first: с чего начать</h3>
+                <p class="post__text">
+                  Почему стоит верстать сначала под телефон.
+                </p>
+                <time class="post__date" datetime="2026-10-10"
+                  >1 окт · 4 мин</time
+                >
+              </a>
+            </article>
+          </div>
+
+          <nav class="pagination" aria-label="Страницы">
+            <a class="pagination__link" href="#" aria-label="Назад">‹</a>
+            <a class="pagination__link" href="#" aria-current="page">1</a>
+            <a class="pagination__link" href="#">2</a>
+            <a class="pagination__link" href="#">3</a>
+            <a class="pagination__link" href="#" aria-label="Вперёд">›</a>
+          </nav>
+        </section>
+
+        <aside class="sidebar">
+          <section class="widget">
+            <h4 class="widget__title">Популярное</h4>
+            <ol class="popular">
+              <li class="popular__item">
+                <span class="popular__num">1</span>
+                <a href="#">Flexbox за 10 минут</a>
+              </li>
+              <li class="popular__item">
+                <span class="popular__num">2</span>
+                <a href="#">Как работает каскад</a>
+              </li>
+              <li class="popular__item">
+                <span class="popular__num">3</span>
+                <a href="#">БЭМ без фанатизма</a>
+              </li>
+            </ol>
+          </section>
+
+          <section class="widget">
+            <h4 class="widget__title">Теги</h4>
+            <ul class="tags">
+              <li><a class="tags__item" href="#">css</a></li>
+              <li><a class="tags__item" href="#">html</a></li>
+              <li><a class="tags__item" href="#">grid</a></li>
+              <li><a class="tags__item" href="#">flexbox</a></li>
+              <li><a class="tags__item" href="#">ux</a></li>
+              <li><a class="tags__item" href="#">ally</a></li>
+              <li><a class="tags__item" href="#">адаптив</a></li>
+            </ul>
+          </section>
+
+          <section class="widget widget--subscribe">
+            <h4 class="widget__title">Рассылка</h4>
+            <p class="widget__text">Лучшие статьи раз в неделю, без спама.</p>
+            <form class="subscribe">
+              <label class="visually-hidden" for="email">Email</label>
+              <input
+                class="subscribe__input"
+                id="email"
+                type="email"
+                placeholder="you@mail.ru"
+                required
+              />
+              <button class="subscribe__btn" type="submit">Подписаться</button>
+            </form>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <p class="footer__copy">© 2026 devnotes</p>
+        <ul class="footer__links">
+          <li><a class="footer__link" href="#">Telegram</a></li>
+          <li><a class="footer__link" href="#">GitHub</a></li>
+          <li><a class="footer__link" href="#">RSS</a></li>
+        </ul>
+      </div>
+    </footer>
+  </body>
+</html>
